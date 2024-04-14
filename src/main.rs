@@ -1,40 +1,60 @@
 use std::env;
 use std::fs;
-use std::process::exit;
+use std::io::{self, BufRead, Write};
 
-
-fn run_file(path: &str) -> Result<(), String> {
-    match fs::read_to_string(path) {
-        Err(msg) => return Err(msg.to_string()),
-        Ok(contents) => return run(&contents),
-    }
-    // let contents = fs::read_to_string(path).expect("Couldnt read file");
-    // run(contents)
-}
-
-fn run_prompt() {
-
-}
-
-fn run(_contents: &str) -> Result<(), String> {
-    return Err("Not done".to_string());
-}
-
-fn main() {
-    let args: Vec<String> = env::args().collect();   
-
-    if args.len() > 2 {
-        println!("Usage: jlox [script]");
-        exit(64);
-    } else if args.len() == 2 {
-        match run_file(&args[1]) {
-            Ok(_) => exit(0),
-            Err(msg) => {
-                println!("ERR:\n{}", msg);
-                exit(1);
-            }
+fn run_prompt() -> Result<(), io::Error> {
+    // loooop 
+    loop {
+        print!("> ");
+        // check if can properly display
+        match io::stdout().flush() {
+            Ok(_) => (),
+            Err(err) => return Err(err),
         }
-    } else {
-        run_prompt();
+        let stdin = io::stdin();
+        let mut h = stdin.lock();
+        let mut buff = String::new();
+        match h.read_line(&mut buff) {
+            Ok(c) => {
+                if c <= 1 {
+                    return Ok(());
+                }
+            }
+            Err(err) => return Err(err)
+        }
+        println!("Output: {}", buff);
+    }
+}
+
+fn run_file(path: &str) -> Result<(), io::Error> {
+    // reads file contents and runs
+    match fs::read_to_string(path) {
+        Ok(contents) => {
+            run(&contents);
+            Ok(())
+        },
+        Err(err) => Err(err),
+    }
+}
+
+fn run(_s: &str) -> Result<(), String> {
+    Err("Not done yet :v)".to_string())
+}
+
+// fn scan_tokens() {
+//     not_implemented()
+// }
+
+fn main() -> Result<(), io::Error> {
+    // get all args, match for how many given
+    let args: Vec<String> = env::args().collect();   
+    match args.len() {
+        // 2 args = script file, 1 = interactive mode, else err
+        2 => run_file(&args[1]),
+        1 => Ok(run_prompt()?),
+        _ => {
+            println!("Usage: midasgo[script]");
+            std::process::exit(64);
+        }
     }
 }
