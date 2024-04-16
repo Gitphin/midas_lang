@@ -1,42 +1,41 @@
 use std::env;
 use std::fs;
 use std::io::{self, BufRead, Write};
+use colored::Colorize;
+use rand::Rng;
 
+// Terminal view, takes in user input
 fn run_prompt() -> Result<(), io::Error> {
     // loooop 
     loop {
-        print!("> ");
+        print!("{}", "Midas > ".truecolor(255,210,0).bold());
         // check if can properly display
         match io::stdout().flush() {
             Ok(_) => (),
             Err(err) => return Err(err),
         }
+        // get user input
         let stdin = io::stdin();
         let mut h = stdin.lock();
         let mut buff = String::new();
-        match h.read_line(&mut buff) {
-            Ok(c) => {
-                if c <= 1 {
-                    return Ok(());
-                }
-            }
-            Err(err) => return Err(err)
+        h.read_line(&mut buff)?;
+        // println!("\nOutput: {}", buff);
+        match buff.trim() {
+            "quit" | "q" => {println!("Goodbye o7"); break Ok(())},
+            "rng" => {let mut rng = rand::thread_rng(); println!("{} is your random number!", rng.gen_range(1..101).to_string().bold())},
+            "hello" => println!("hi :v)"),
+            _  => (),
         }
-        println!("Output: {}", buff);
     }
 }
-
+ // Reads file contents and runs
 fn run_file(path: &str) -> Result<(), io::Error> {
-    // reads file contents and runs
-    match fs::read_to_string(path) {
-        Ok(contents) => {
-            run(&contents);
-            Ok(())
-        },
-        Err(err) => Err(err),
-    }
+    let contents = fs::read_to_string(path)?;
+    // TO FIX: let _ 
+    let _ = run(&contents);
+    Ok(())
 }
-
+// Not implemented yet, should run this
 fn run(_s: &str) -> Result<(), String> {
     Err("Not done yet :v)".to_string())
 }
@@ -46,10 +45,9 @@ fn run(_s: &str) -> Result<(), String> {
 // }
 
 fn main() -> Result<(), io::Error> {
-    // get all args, match for how many given
     let args: Vec<String> = env::args().collect();   
     match args.len() {
-        // 2 args = script file, 1 = interactive mode, else err
+        // 2 args = script file, 1 = interactive mode, else exit
         2 => run_file(&args[1]),
         1 => Ok(run_prompt()?),
         _ => {
