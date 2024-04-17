@@ -1,58 +1,75 @@
+mod scanner;
+use crate::scanner::*;
+
+use std::process::exit;
 use std::env;
 use std::fs;
 use std::io::{self, BufRead, Write};
 use colored::Colorize;
-use rand::Rng;
 
 // Terminal view, takes in user input
-fn run_prompt() -> Result<(), io::Error> {
-    // loooop 
+fn run_prompt() -> Result<(), String> {
+    // NOTE: this might need to be put in loop, will see!
+    let mut buff = String::new();
     loop {
         print!("{}", "Midas > ".truecolor(255,210,0).bold());
         // check if can properly display
         match io::stdout().flush() {
             Ok(_) => (),
-            Err(err) => return Err(err),
+            Err(e) => return Err(e.to_string()),
         }
         // get user input
         let stdin = io::stdin();
         let mut h = stdin.lock();
-        let mut buff = String::new();
-        h.read_line(&mut buff)?;
-        // println!("\nOutput: {}", buff);
-        match buff.trim() {
-            "quit" | "q" => {println!("Goodbye o7"); break Ok(())},
-            "rng" => {let mut rng = rand::thread_rng(); println!("{} is your random number!", rng.gen_range(1..101).to_string().bold())},
-            "hello" => println!("hi :v)"),
-            _  => (),
+        match h.read_line(&mut buff) {
+            Ok(_) => (),
+            Err(e) => return Err(e.to_string()),
         }
+        // quit loop
+        if buff.trim() == "exit" {
+            println!("{}", "Stay gold, Ponyboy o7".bold());
+            break Ok(());
+        }
+        // run user input
+        // match run(&buff) {
+        //     Ok(_) => (),
+        //     Err(e) => println!("{}", e),
+        // }
+        buff.clear();
     }
 }
- // Reads file contents and runs
-fn run_file(path: &str) -> Result<(), io::Error> {
-    let contents = fs::read_to_string(path)?;
-    // TO FIX: let _ 
-    let _ = run(&contents);
-    Ok(())
+// Reads file contents and runs
+fn run_file(path: &str) -> Result<(), String> {
+    match fs::read_to_string(path) {
+        Ok(c) => return run(&c),
+        Err(e) => return Err(e.to_string())
+    }
 }
-// Not implemented yet, should run this
-fn run(_s: &str) -> Result<(), String> {
-    Err("Not done yet :v)".to_string())
+// Run and get tokens
+fn run(contents: &str) -> Result<(), String> {
+    let mut s = Scanner::new(contents);
+    let tokens = s.scan_tokens()?;
+    for t in tokens {
+        println!("{:?}", t);
+    }
+    return Ok(())
 }
 
-// fn scan_tokens() {
-//     not_implemented()
-// }
-
-fn main() -> Result<(), io::Error> {
+fn main() -> Result<(), String> {
     let args: Vec<String> = env::args().collect();   
     match args.len() {
         // 2 args = script file, 1 = interactive mode, else exit
-        2 => run_file(&args[1]),
-        1 => Ok(run_prompt()?),
+        1 => match run_prompt() {
+            Ok(_) => exit(0),
+            Err(e) => {println!("{} {}", "ERR:".red().bold(), e); exit(1)},
+        }
+        2 => match run_file(&args[1]) {
+            Ok(_) => exit(0),
+            Err(e) => {println!("{} {}", "ERR:".red().bold(), e); exit(1)},
+        }
         _ => {
             println!("Usage: midasgo[script]");
-            std::process::exit(64);
+            exit(64);
         }
     }
 }
