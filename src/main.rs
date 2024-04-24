@@ -31,10 +31,10 @@ fn run_prompt() -> Result<(), String> {
             break Ok(());
         }
         // run user input
-        // match run(&buff) {
-        //     Ok(_) => (),
-        //     Err(e) => println!("{}", e),
-        // }
+        match run(&buff) {
+            Ok(_) => (),
+            Err(e) => println!("{}", e),
+        }
         buff.clear();
     }
 }
