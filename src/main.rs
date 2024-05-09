@@ -5,14 +5,13 @@ use std::process::exit;
 use std::env;
 use std::fs;
 use std::io::{self, BufRead, Write};
-use colored::Colorize;
 
 // Terminal view, takes in user input
 fn run_prompt() -> Result<(), String> {
     // NOTE: this might need to be put in loop, will see!
     let mut buff = String::new();
     loop {
-        print!("{}", "Midas > ".truecolor(255,210,0).bold());
+        print!("{}","(/•ิ_•ิ)/ → ");
         // check if can properly display
         match io::stdout().flush() {
             Ok(_) => (),
@@ -27,7 +26,7 @@ fn run_prompt() -> Result<(), String> {
         }
         // quit loop
         if buff.trim() == "exit" {
-            println!("{}", "Stay gold, Ponyboy o7".bold());
+            println!("{}", "Stay gold, Ponyboy...");
             break Ok(());
         }
         // run user input
@@ -52,7 +51,7 @@ fn run(contents: &str) -> Result<(), String> {
     for t in tokens {
         println!("{:?}", t);
     }
-    return Ok(())
+    Ok(())
 }
 
 fn main() -> Result<(), String> {
@@ -61,14 +60,14 @@ fn main() -> Result<(), String> {
         // 2 args = script file, 1 = interactive mode, else exit
         1 => match run_prompt() {
             Ok(_) => exit(0),
-            Err(e) => {println!("{} {}", "ERR:".red().bold(), e); exit(1)},
+            Err(e) => Err(e.to_string()),
         }
         2 => match run_file(&args[1]) {
             Ok(_) => exit(0),
-            Err(e) => {println!("{} {}", "ERR:".red().bold(), e); exit(1)},
+            Err(e) => Err(e.to_string()),
         }
         _ => {
-            println!("Usage: midasgo[script]");
+            println!("Usage: midas_lang[script]");
             exit(64);
         }
     }
