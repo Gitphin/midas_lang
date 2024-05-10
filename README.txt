@@ -1,5 +1,3 @@
-Midas Language by Dolphin
+A coding language that I wanted to make while learning how to use Rust
 
-- This is my first attempt at a compiler while learning Rust, surely this will go very smoothly! 
-
-I am referencing the book "Crafting Interpreters" as I go, although it mainly focuses on a Java implementation :(.
+I am referencing the book "Crafting Interpreters". It pretty much goes off of a Java implementation so am doing my own loosely based Rust version of it.
