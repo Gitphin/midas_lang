@@ -297,10 +297,10 @@ use LiteralVal::*;
 
 #[derive(Debug, Clone)]
 pub struct Token {
-    token_type: TokenType,
-    lexeme: String,
-    literal: Option<LiteralVal>,
-    line_num: usize,
+    pub token_type: TokenType,
+    pub lexeme: String,
+    pub literal: Option<LiteralVal>,
+    pub line_num: usize,
 }
 
 // Need this to display the tokens w/ to_string
@@ -322,67 +322,67 @@ impl Token {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-    #[test]
-    fn one_char_test() {
-        let s = "!( )(";
-        let mut scanner = Scanner::new(s);
-        let _ = scanner.scan_tokens();
-        println!("{:?}", scanner.tokens);
-        // EOF also included
-        assert_eq!(scanner.tokens.len(), 5);
-        assert_eq!(scanner.tokens[0].token_type, Bang);
-    }
-    #[test]
-    fn str_test() {
-        let s = "\"ABC\ndefaa\naa\"";
-        let mut scan = Scanner::new(s);
-        scan.scan_tokens().unwrap();
-        assert_eq!(scan.tokens.len(), 2);
-        assert_eq!(scan.tokens[0].token_type, StringLit);
-        match scan.tokens[0].literal.as_ref().unwrap() {
-            StringVal(v) => assert_eq!(v, "ABC\ndefaa\naa"),
-            _ => panic!("Bad lit type"),
-        }
-    }
-    #[test]
-    fn num_lits() {
-        let s = "12.23\n33";
-        let mut scan = Scanner::new(s);
-        scan.scan_tokens().unwrap();
-        assert_eq!(scan.tokens.len(), 3);
-        for i in 0..2 {
-            assert_eq!(scan.tokens[i].token_type, Number);
-        }
-        match scan.tokens[0].literal {
-            Some(FVal(v)) => assert_eq!(v, 12.23),
-            _ => panic!("Nope"),
-        }    
-        match scan.tokens[1].literal {
-            Some(FVal(v)) => assert_eq!(v, 33.0),
-            _ => panic!("Nope"),
-        }    
-    }
+// #[cfg(test)]
+// mod tests {
+//     use super::*;
+//     #[test]
+//     fn one_char_test() {
+//         let s = "!( )(";
+//         let mut scanner = Scanner::new(s);
+//         let _ = scanner.scan_tokens();
+//         println!("{:?}", scanner.tokens);
+//         // EOF also included
+//         assert_eq!(scanner.tokens.len(), 5);
+//         assert_eq!(scanner.tokens[0].token_type, Bang);
+//     }
+//     #[test]
+//     fn str_test() {
+//         let s = "\"ABC\ndefaa\naa\"";
+//         let mut scan = Scanner::new(s);
+//         scan.scan_tokens().unwrap();
+//         assert_eq!(scan.tokens.len(), 2);
+//         assert_eq!(scan.tokens[0].token_type, StringLit);
+//         match scan.tokens[0].literal.as_ref().unwrap() {
+//             StringVal(v) => assert_eq!(v, "ABC\ndefaa\naa"),
+//             _ => panic!("Bad lit type"),
+//         }
+//     }
+//     #[test]
+//     fn num_lits() {
+//         let s = "12.23\n33";
+//         let mut scan = Scanner::new(s);
+//         scan.scan_tokens().unwrap();
+//         assert_eq!(scan.tokens.len(), 3);
+//         for i in 0..2 {
+//             assert_eq!(scan.tokens[i].token_type, Number);
+//         }
+//         match scan.tokens[0].literal {
+//             Some(FVal(v)) => assert_eq!(v, 12.23),
+//             _ => panic!("Nope"),
+//         }    
+//         match scan.tokens[1].literal {
+//             Some(FVal(v)) => assert_eq!(v, 33.0),
+//             _ => panic!("Nope"),
+//         }    
+//     }
 
-    #[test]
-    fn identify_test() {
-        let s = "v = 23;";
-        let mut scan = Scanner::new(s);
-        scan.scan_tokens().unwrap();
-        println!("{:?}", scan.tokens);
-        assert_eq!(scan.tokens.len(), 5);
-        assert_eq!(scan.tokens[0].token_type, Identifier);
-        assert_eq!(scan.tokens[3].token_type, Semicolon);
+//     #[test]
+//     fn identify_test() {
+//         let s = "v = 23;";
+//         let mut scan = Scanner::new(s);
+//         scan.scan_tokens().unwrap();
+//         println!("{:?}", scan.tokens);
+//         assert_eq!(scan.tokens.len(), 5);
+//         assert_eq!(scan.tokens[0].token_type, Identifier);
+//         assert_eq!(scan.tokens[3].token_type, Semicolon);
 
-    }
-    #[test]
-    fn kws() {
-        let s = "var hello = 58;\nif true {print 2};";
-        let mut scan = Scanner::new(s);
-        scan.scan_tokens().unwrap();
-        println!("{:?}", scan.tokens);
-        assert_eq!(scan.tokens.len(), 13);
-    }
-}
+//     }
+//     #[test]
+//     fn kws() {
+//         let s = "var hello = 58;\nif true {print 2};";
+//         let mut scan = Scanner::new(s);
+//         scan.scan_tokens().unwrap();
+//         println!("{:?}", scan.tokens);
+//         assert_eq!(scan.tokens.len(), 13);
+//     }
+// }

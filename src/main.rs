@@ -1,4 +1,5 @@
 mod scanner;
+mod expr;
 use crate::scanner::*;
 
 use std::process::exit;
@@ -58,17 +59,11 @@ fn main() -> Result<(), String> {
     let args: Vec<String> = env::args().collect();   
     match args.len() {
         // 2 args = script file, 1 = interactive mode, else exit
-        1 => match run_prompt() {
-            Ok(_) => exit(0),
-            Err(e) => Err(e.to_string()),
-        }
-        2 => match run_file(&args[1]) {
-            Ok(_) => exit(0),
-            Err(e) => Err(e.to_string()),
-        }
+        1 => run_prompt(),
+        2 => run_file(&args[1]),
         _ => {
             println!("Usage: midas_lang[script]");
-            exit(64);
+            exit(64)
         }
     }
 }
