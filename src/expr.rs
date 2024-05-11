@@ -19,7 +19,7 @@ impl LiteralVal {
     pub fn format_str(&self) -> String {
         match self {
             LiteralVal::NumVal(v) => v.to_string(),
-            LiteralVal::StringVal(v) => v.clone(),
+            LiteralVal::StringVal(v) => (&v).to_string(),
             LiteralVal::TrueVal => "true".to_string(),
             LiteralVal::FalseVal => "false".to_string(),
             LiteralVal::NilVal => "nil".to_string(),
@@ -42,14 +42,10 @@ impl Expr {
             Expr::Binary {l, r, op} => format!("({} {} {})", op.lexeme, l.format_str(), r.format_str()),
             Expr::Grouping {expr} => format!("(group {})", (*expr).format_str()),
             Expr::Literal {val} => format!("{}", val.format_str()),
-            Expr::Unary {op, r} => {
-                let r_str = (*r).format_str();
-                let op_str = &op.lexeme;
-                format!("({} {})", op_str, r_str)
-            }
+            Expr::Unary {op, r} => format!("({} {})", &op.lexeme, (*r).format_str())
         }
     }
-    // Pretty printer: prints structure of syntax tree
+    // Prints structure of syntax tree (useful for debugging)
     pub fn pretty_print(&self) {
         println!("{}", self.format_str());
     }
