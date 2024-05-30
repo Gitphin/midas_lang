@@ -5,14 +5,13 @@ use crate::scanner::Token;
 // use std::io::{BufWriter, Write};
 
 
-
 // Need this to handle literal values within AST tree, similar to scanner impl
 pub enum LiteralVal {
     NumVal(f32),
     StringVal(String),
     TrueVal,
     FalseVal,
-    NilVal,
+    NullVal,
 }
 
 impl LiteralVal {
@@ -22,11 +21,10 @@ impl LiteralVal {
             LiteralVal::StringVal(v) => (&v).to_string(),
             LiteralVal::TrueVal => "true".to_string(),
             LiteralVal::FalseVal => "false".to_string(),
-            LiteralVal::NilVal => "nil".to_string(),
+            LiteralVal::NullVal => "null".to_string(),
         }
     }
 }
-
 // AST expression implementation
 pub enum Expr {
     Binary {op: Token, l: Box<Expr>, r: Box<Expr>},
@@ -34,7 +32,7 @@ pub enum Expr {
     Literal {val: LiteralVal},
     Unary {op: Token, r: Box<Expr>}
 }
-
+// Expression to 
 impl Expr {
     // Matches expr and formats to print correctly
     pub fn format_str(&self) -> String {
@@ -57,7 +55,6 @@ mod tests {
     use crate::TokenType;
     use super::Expr::*;
     use super::LiteralVal::*;
-
     use super::*;
 
     #[test]
