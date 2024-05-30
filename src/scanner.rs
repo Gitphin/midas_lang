@@ -27,7 +27,7 @@ fn get_kws_hash() -> HashMap<&'static str, TokenType> {
         ("for", For),
         ("if", If),
         ("fun", Fun),
-        ("nil", Nil),
+        ("null", Null),
         ("or", Or),
         ("print", Print),
         ("return", Return),
@@ -277,7 +277,7 @@ pub enum TokenType {
     // Literals
     Identifier, StringLit, Number,
     // Keywords
-    And, Class, Else, False, Fun, For, If, Nil,
+    And, Class, Else, False, Fun, For, If, Null,
     Or, Print, Return, Super, This, True, Var, While,
 
     Eof
