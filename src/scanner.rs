@@ -257,9 +257,9 @@ impl Scanner {
         let _ = self.source[self.start..self.current].chars().map(|c| text.push(c));
         // add to token vec
         self.tokens.push(Token {
-            token_type: token_type,
+            token_type,
             lexeme: text,
-            literal: literal,
+            literal,
             line_num: self.line,
         });
 
