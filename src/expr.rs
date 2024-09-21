@@ -4,7 +4,6 @@ use crate::scanner::Token;
 // use std::fs::File;
 // use std::io::{BufWriter, Write};
 
-
 // Need this to handle literal values within AST tree, similar to scanner impl
 pub enum LiteralVal {
     NumVal(f32),
@@ -27,20 +26,33 @@ impl LiteralVal {
 }
 // AST expression implementation
 pub enum Expr {
-    Binary {op: Token, l: Box<Expr>, r: Box<Expr>},
-    Grouping {expr: Box<Expr>},
-    Literal {val: LiteralVal},
-    Unary {op: Token, r: Box<Expr>}
+    Binary {
+        op: Token,
+        l: Box<Expr>,
+        r: Box<Expr>,
+    },
+    Grouping {
+        expr: Box<Expr>,
+    },
+    Literal {
+        val: LiteralVal,
+    },
+    Unary {
+        op: Token,
+        r: Box<Expr>,
+    },
 }
-// Expression to 
+// Expression to
 impl Expr {
     // Matches expr and formats to print correctly
     pub fn format_str(&self) -> String {
         match self {
-            Expr::Binary {l, r, op} => format!("({} {} {})", op.lexeme, l.format_str(), r.format_str()),
-            Expr::Grouping {expr} => format!("(group {})", (*expr).format_str()),
-            Expr::Literal {val} => format!("{}", val.format_str()),
-            Expr::Unary {op, r} => format!("({} {})", &op.lexeme, (*r).format_str())
+            Expr::Binary { l, r, op } => {
+                format!("({} {} {})", op.lexeme, l.format_str(), r.format_str())
+            }
+            Expr::Grouping { expr } => format!("(group {})", (*expr).format_str()),
+            Expr::Literal { val } => format!("{}", val.format_str()),
+            Expr::Unary { op, r } => format!("({} {})", &op.lexeme, (*r).format_str()),
         }
     }
     // Prints structure of syntax tree (useful for debugging)
@@ -49,26 +61,42 @@ impl Expr {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
-    use crate::TokenType;
     use super::Expr::*;
     use super::LiteralVal::*;
     use super::*;
+    use crate::TokenType;
 
     #[test]
     fn print_out() {
-        let plus = Token {token_type: TokenType::Plus, lexeme: "+".to_string(), literal: None, line_num: 0};
-        let star = Token {token_type: TokenType::Star, lexeme: "*".to_string(), literal: None, line_num: 0};
-        let lit_test = Literal { val: NumVal(326.5)};
-        let g = Grouping {expr: Box::from(Literal {val: NumVal(23.5)})};
-        let tree_time = Binary {op: star, l: Box::from(Unary {op: plus, r: Box::from(lit_test)}), r: Box::from(g)};
+        let plus = Token {
+            token_type: TokenType::Plus,
+            lexeme: "+".to_string(),
+            literal: None,
+            line_num: 0,
+        };
+        let star = Token {
+            token_type: TokenType::Star,
+            lexeme: "*".to_string(),
+            literal: None,
+            line_num: 0,
+        };
+        let lit_test = Literal { val: NumVal(326.5) };
+        let g = Grouping {
+            expr: Box::from(Literal { val: NumVal(23.5) }),
+        };
+        let tree_time = Binary {
+            op: star,
+            l: Box::from(Unary {
+                op: plus,
+                r: Box::from(lit_test),
+            }),
+            r: Box::from(g),
+        };
         tree_time.pretty_print();
     }
 }
-
-
 
 // NOTE: This approach only works better for the Java implementation, come back to if needed
 // pub struct GenerateAst;
@@ -95,7 +123,7 @@ mod tests {
 //             Ok(file) => file,
 //             Err(err) => return Err(format!("Failed to create file: {}", err)),
 //         };
-    
+
 //         // Create a buffered writer to write to the file
 //         let mut writer = BufWriter::new(file);
 //         writer.write("");
