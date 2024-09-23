@@ -253,7 +253,6 @@ impl Scanner {
     }
     // Advances string index of the source
     fn advance(&mut self) -> char {
-        //NOTE: Updating curr might have to be placed BEFORE let c
         let c = self.source.chars().nth(self.current).unwrap();
         self.current += 1;
         c
@@ -366,7 +365,7 @@ impl Token {
         }
     }
     // Converts to string format
-    pub fn to_string(&self) -> String {
+    pub fn format_str(&self) -> String {
         // format is useful here to combine and return a string
         format!("{} {} {:?}", self.token_type, self.lexeme, self.literal)
     }

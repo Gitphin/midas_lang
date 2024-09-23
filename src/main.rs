@@ -51,8 +51,9 @@ fn run(contents: &str) -> Result<(), String> {
     let mut s = Scanner::new(contents);
     let tokens = s.scan_tokens()?;
     let mut p = Parser::new(tokens);
-    let pe = p.expression()?;
-    println!("{}", pe.format_str());
+    let e = p.parse()?;
+    let r = e.eval()?;
+    println!("{}", r.format_str());
     Ok(())
 }
 
