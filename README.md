@@ -15,6 +15,7 @@ cargo run
 - Math!
 - Some basic syntax/error suggestions
 - Truthiness
+- String concatenation
 - A cool funny looking dude in the prompt
 
 # TODO:
