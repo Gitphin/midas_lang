@@ -29,7 +29,7 @@ unwrapping/clone should be limited
 ### Parser - [x]
 Small bugfixes needed such as '(' parenthesis and  
 when to panic vs when no to
-### Interpretor - [x]
+### Interpreter - [x]
 Add more cases / line numbers in error msgs
 
 
