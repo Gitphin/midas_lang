@@ -106,8 +106,7 @@ impl Parser {
                     val: LiteralVal::token_fmt(t),
                 }
             }
-
-            _ => return Err("Expected expression".to_string()),
+            _ => return Err("Expected expression here".to_string()),
         };
         Ok(res)
     }
@@ -184,6 +183,7 @@ impl Parser {
         }
     }
 }
+
 
 #[cfg(test)]
 mod tests {

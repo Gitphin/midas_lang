@@ -1,19 +1,22 @@
-mod scanner;
 mod expr;
+mod interpreter;
 mod parser;
-use crate::parser::*; 
+mod scanner;
+use crate::interpreter::*;
+use crate::parser::*;
 use crate::scanner::*;
-use std::process::exit;
 use std::env;
 use std::fs;
 use std::io::{self, BufRead, Write};
+use std::process::exit;
 
 // Terminal view, takes in user input
 fn run_prompt() -> Result<(), String> {
     // NOTE: this might need to be put in loop, will see!
+    let mut intr: Interpreter = Interpreter::new();
     let mut buff = String::new();
     loop {
-        print!("{}","(/•ิ_•ิ)/ → ");
+        print!("{}", "(/•ิ_•ิ)/ → ");
         // check if can properly display
         match io::stdout().flush() {
             Ok(_) => (),
@@ -32,7 +35,7 @@ fn run_prompt() -> Result<(), String> {
             break Ok(());
         }
         // run user input
-        match run(&buff) {
+        match run(&mut intr, &buff) {
             Ok(_) => (),
             Err(e) => println!("{}", e),
         }
@@ -41,24 +44,25 @@ fn run_prompt() -> Result<(), String> {
 }
 // Reads file contents and runs
 fn run_file(path: &str) -> Result<(), String> {
+    let mut intr = Interpreter::new();
     match fs::read_to_string(path) {
-        Ok(c) => return run(&c),
-        Err(e) => return Err(e.to_string())
+        Ok(c) => return run(&mut intr, &c),
+        Err(e) => return Err(e.to_string()),
     }
 }
 // Run and get tokens
-fn run(contents: &str) -> Result<(), String> {
+fn run(intr: &mut Interpreter, contents: &str) -> Result<(), String> {
     let mut s = Scanner::new(contents);
     let tokens = s.scan_tokens()?;
     let mut p = Parser::new(tokens);
     let e = p.parse()?;
-    let r = e.eval()?;
+    let r = intr.interpret(e)?;
     println!("{}", r.format_str());
     Ok(())
 }
 
 fn main() -> Result<(), String> {
-    let args: Vec<String> = env::args().collect();   
+    let args: Vec<String> = env::args().collect();
     match args.len() {
         // 2 args = script file, 1 = interactive mode, else exit
         1 => run_prompt(),
@@ -69,3 +73,4 @@ fn main() -> Result<(), String> {
         }
     }
 }
+

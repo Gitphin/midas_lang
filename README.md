@@ -14,7 +14,7 @@ cargo run
 ### FEATURES:
 - Math!
 - Some basic syntax/error suggestions
-- Truthiness
+- Truthiness and equality
 - String concatenation
 - A cool funny looking dude in the prompt
 
@@ -27,5 +27,11 @@ Basic right now, make better in future
 Small optimizations to be made, use of
 unwrapping should be limited
 ### Parser - [x]
-Small bugfixes needed such as '(' parenthesis
+Small bugfixes needed such as '(' parenthesis and  
+when to panic vs when no to
 ### Interpretor - [ ]
+Move to seperate file? Right now just in expr
+Add more cases / line numbers in error msgs
+Format error message of Literal types better (ex: TrueVal to 'true')
+
+

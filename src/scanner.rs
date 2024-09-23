@@ -20,20 +20,20 @@ fn get_kws_hash() -> HashMap<&'static str, TokenType> {
     // NAMES for keywords
     HashMap::from([
         ("and", And),
-        ("class", Class),
+        ("cls", Class),
         ("else", Else),
         ("true", True),
         ("false", False),
         ("for", For),
         ("if", If),
-        ("fun", Fun),
+        ("fnc", Fun),
         ("null", Null),
         ("or", Or),
         ("print", Print),
-        ("return", Return),
+        ("ret", Return),
         ("super", Super),
         ("this", This),
-        ("var", Var),
+        ("let", Var),
         ("while", While),
     ])
 }
@@ -196,7 +196,7 @@ impl Scanner {
         let v = s.parse::<f64>();
         match v {
             Ok(v) => self.add_token_p2(Number, Some(FVal(v))),
-            Err(_) => return Err(format!("Could not parse num: {}", s)),
+            Err(_) => return Err(format!("Could not parse num: -=({})=-", s)),
         }
         Ok(())
     }
