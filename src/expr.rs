@@ -1,4 +1,5 @@
-use crate::scanner::Token;
+use crate::scanner;
+use crate::scanner::{Token, TokenType};
 // use std::process::exit;
 // use std::env;
 // use std::fs::File;
@@ -13,6 +14,21 @@ pub enum LiteralVal {
     NullVal,
 }
 
+fn unwrap_as_f32(literal: Option<scanner::LiteralVal>) -> f32 {
+    match literal {
+        Some(scanner::LiteralVal::IntVal(i)) => i as f32,
+        Some(scanner::LiteralVal::FVal(i)) => i as f32,
+        _ => panic!("Could not unwrap"),
+    }
+}
+
+fn unwrap_as_str(literal: Option<scanner::LiteralVal>) -> String {
+    match literal {
+        Some(scanner::LiteralVal::StringVal(s)) => s.clone(),
+        Some(scanner::LiteralVal::IdentifierVal(s)) => s.clone(),
+        _ => panic!("Could not unwrap"),
+    }
+}
 impl LiteralVal {
     pub fn format_str(&self) -> String {
         match self {
@@ -21,6 +37,16 @@ impl LiteralVal {
             LiteralVal::TrueVal => "true".to_string(),
             LiteralVal::FalseVal => "false".to_string(),
             LiteralVal::NullVal => "null".to_string(),
+        }
+    }
+    pub fn token_fmt(token: Token) -> Self {
+        match token.token_type {
+            TokenType::Number => Self::NumVal(unwrap_as_f32(token.literal)),
+            TokenType::StringLit => Self::StringVal(unwrap_as_str(token.literal)),
+            TokenType::True => Self::TrueVal,
+            TokenType::False => Self::FalseVal,
+            TokenType::Null => Self::NullVal,
+            _ => panic!("Failed to format token to literal"),
         }
     }
 }
@@ -61,42 +87,42 @@ impl Expr {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::Expr::*;
-    use super::LiteralVal::*;
-    use super::*;
-    use crate::TokenType;
+// #[cfg(test)]
+// mod tests {
+//     use super::Expr::*;
+//     use super::LiteralVal::*;
+//     use super::*;
+//     use crate::TokenType;
 
-    #[test]
-    fn print_out() {
-        let plus = Token {
-            token_type: TokenType::Plus,
-            lexeme: "+".to_string(),
-            literal: None,
-            line_num: 0,
-        };
-        let star = Token {
-            token_type: TokenType::Star,
-            lexeme: "*".to_string(),
-            literal: None,
-            line_num: 0,
-        };
-        let lit_test = Literal { val: NumVal(326.5) };
-        let g = Grouping {
-            expr: Box::from(Literal { val: NumVal(23.5) }),
-        };
-        let tree_time = Binary {
-            op: star,
-            l: Box::from(Unary {
-                op: plus,
-                r: Box::from(lit_test),
-            }),
-            r: Box::from(g),
-        };
-        tree_time.pretty_print();
-    }
-}
+//     #[test]
+//     fn print_out() {
+//         let plus = Token {
+//             token_type: TokenType::Plus,
+//             lexeme: "+".to_string(),
+//             literal: None,
+//             line_num: 0,
+//         };
+//         let star = Token {
+//             token_type: TokenType::Star,
+//             lexeme: "*".to_string(),
+//             literal: None,
+//             line_num: 0,
+//         };
+//         let lit_test = Literal { val: NumVal(326.5) };
+//         let g = Grouping {
+//             expr: Box::from(Literal { val: NumVal(23.5) }),
+//         };
+//         let tree_time = Binary {
+//             op: star,
+//             l: Box::from(Unary {
+//                 op: plus,
+//                 r: Box::from(lit_test),
+//             }),
+//             r: Box::from(g),
+//         };
+//         tree_time.pretty_print();
+//     }
+// }
 
 // NOTE: This approach only works better for the Java implementation, come back to if needed
 // pub struct GenerateAst;

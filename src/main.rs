@@ -1,8 +1,8 @@
 mod scanner;
 mod expr;
 mod parser;
+use crate::parser::*; 
 use crate::scanner::*;
-
 use std::process::exit;
 use std::env;
 use std::fs;
@@ -50,9 +50,9 @@ fn run_file(path: &str) -> Result<(), String> {
 fn run(contents: &str) -> Result<(), String> {
     let mut s = Scanner::new(contents);
     let tokens = s.scan_tokens()?;
-    for t in tokens {
-        println!("{:?}", t);
-    }
+    let mut p = Parser::new(tokens);
+    let pe = p.expression()?;
+    println!("{}", pe.format_str());
     Ok(())
 }
 
