@@ -26,8 +26,8 @@ impl Parser {
             let operation = self.previous();
             let r: Expr = self.comparison()?;
             expr = Binary {
-                op: operation,
                 l: Box::from(expr),
+                op: operation,
                 r: Box::from(r),
             };
         }
@@ -39,8 +39,8 @@ impl Parser {
             let operation: Token = self.previous();
             let r: Expr = self.term()?;
             expr = Binary {
-                op: operation,
                 l: Box::from(expr),
+                op: operation,
                 r: Box::from(r),
             };
         }
@@ -54,8 +54,8 @@ impl Parser {
             let operation: Token = self.previous();
             let r: Expr = self.factor()?;
             expr = Binary {
-                op: operation,
                 l: Box::from(expr),
+                op: operation,
                 r: Box::from(r),
             };
         }
@@ -69,8 +69,8 @@ impl Parser {
             let operation: Token = self.previous();
             let r: Expr = self.unary()?;
             expr = Binary {
-                op: operation,
                 l: Box::from(expr),
+                op: operation,
                 r: Box::from(r),
             };
         }
