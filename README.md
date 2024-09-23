@@ -6,9 +6,10 @@ This is a work in progress, and I hope to have basic functionality soon.
 
 
 ## To Run via CLI
-'''
+
+```
 cargo run
-'''
+```
 
 ### FEATURES:
 - Math!
