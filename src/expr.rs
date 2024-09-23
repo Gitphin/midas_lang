@@ -6,7 +6,7 @@ use crate::scanner::{Token, TokenType};
 // use std::io::{BufWriter, Write};
 
 // Literal value class (converted to enum for Rust implementation)
-#[derive(Clone)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum LiteralVal {
     NumVal(f32),
     StringVal(String),
@@ -22,7 +22,7 @@ fn unwrap_as_f32(literal: Option<scanner::LiteralVal>) -> f32 {
     match literal {
         Some(scanner::LiteralVal::IntVal(i)) => i as f32,
         Some(scanner::LiteralVal::FVal(i)) => i as f32,
-        _ => panic!("Could not unwrap"),
+        _ => panic!("Could not unwrap as f32"),
     }
 }
 // Helper for token_fmt, just tries to unwrap value in Result type
@@ -30,7 +30,7 @@ fn unwrap_as_str(literal: Option<scanner::LiteralVal>) -> String {
     match literal {
         Some(scanner::LiteralVal::StringVal(s)) => s.clone(),
         Some(scanner::LiteralVal::IdentifierVal(s)) => s.clone(),
-        _ => panic!("Could not unwrap"),
+        _ => panic!("Could not unwrap as String"),
     }
 }
 impl LiteralVal {
@@ -42,6 +42,16 @@ impl LiteralVal {
             LiteralVal::TrueVal => "true".to_string(),
             LiteralVal::FalseVal => "false".to_string(),
             LiteralVal::NullVal => "null".to_string(),
+        }
+    }
+
+    pub fn as_literal_type(&self) -> String {
+        match self {
+            LiteralVal::NumVal(_) => "Number".to_string(),
+            LiteralVal::StringVal(_) => "String".to_string(),
+            LiteralVal::TrueVal => "Boolean".to_string(),
+            LiteralVal::FalseVal => "Boolean".to_string(),
+            LiteralVal::NullVal => "Boolean".to_string(),
         }
     }
     // Formats the Token input into a Literal value
@@ -78,8 +88,8 @@ impl LiteralVal {
             NullVal => TrueVal,
         }
     }
-
-    pub fn from_boolean(b: bool) -> Self {
+    // Very simple bool truthy check to convert as a LiteralVal for booleans
+    pub fn is_boolean_truthy(b: bool) -> Self {
         if b {
             TrueVal
         } else {
@@ -132,11 +142,12 @@ impl Expr {
                 match (op.token_type, r.clone()) {
                     (TokenType::Minus, NumVal(x)) => Ok(NumVal(-x)),
                     // TODO: add for floats
-                    (TokenType::Minus, _) => {
-                        Err(format!("Cannot use minus for {}", r.format_str()))
-                    }
+                    (TokenType::Minus, _) => Err(format!(
+                        "Cannot use Minus operator on type {}",
+                        r.as_literal_type()
+                    )),
                     (TokenType::Bang, any) => Ok(any.is_falsy()),
-                    _ => todo!(),
+                    (tt, _) => Err(format!("{} is not a valid operator for unaries", tt)),
                 }
             }
             // TODO: Keep adding stuff for this
@@ -148,33 +159,53 @@ impl Expr {
                     (NumVal(x), TokenType::Minus, NumVal(y)) => Ok(NumVal(x - y)),
                     (NumVal(x), TokenType::Slash, NumVal(y)) => Ok(NumVal(x / y)),
                     (NumVal(x), TokenType::Star, NumVal(y)) => Ok(NumVal(x * y)),
+
                     (NumVal(x), TokenType::Greater, NumVal(y)) => {
-                        Ok(LiteralVal::from_boolean(x > y))
+                        Ok(LiteralVal::is_boolean_truthy(x > y))
                     }
                     (NumVal(x), TokenType::GreaterEqual, NumVal(y)) => {
-                        Ok(LiteralVal::from_boolean(x >= y))
+                        Ok(LiteralVal::is_boolean_truthy(x >= y))
                     }
-                    (NumVal(x), TokenType::Less, NumVal(y)) => Ok(LiteralVal::from_boolean(x < y)),
+                    (NumVal(x), TokenType::Less, NumVal(y)) => {
+                        Ok(LiteralVal::is_boolean_truthy(x < y))
+                    }
                     (NumVal(x), TokenType::LessEqual, NumVal(y)) => {
-                        Ok(LiteralVal::from_boolean(x <= y))
-                    }
-                    (NumVal(x), TokenType::BangEqual, NumVal(y)) => {
-                        Ok(LiteralVal::from_boolean(x != y))
-                    }
-                    (NumVal(x), TokenType::EqualEqual, NumVal(y)) => {
-                        Ok(LiteralVal::from_boolean(x == y))
+                        Ok(LiteralVal::is_boolean_truthy(x <= y))
                     }
 
-                    (StringVal(s), TokenType::Plus, StringVal(ss)) => {
-                        Ok(StringVal(format!("{}{}", s, ss)))
+                    (StringVal(s), TokenType::Plus, StringVal(s2)) => {
+                        Ok(StringVal(format!("{}{}", s, s2)))
                     }
-                    (NumVal(_), op, StringVal(_)) => {
-                        Err(format!("Cannot use {} operater between string and number types", op))
+                    (StringVal(s), TokenType::Greater, StringVal(s2)) => {
+                        Ok(LiteralVal::is_boolean_truthy(s > s2))
                     }
-                    (StringVal(_), op, NumVal(_)) => {
-                        Err(format!("Cannot use {} operater between string and number types", op))
+                    (StringVal(s), TokenType::GreaterEqual, StringVal(s2)) => {
+                        Ok(LiteralVal::is_boolean_truthy(s >= s2))
                     }
-                    _ => todo!(),
+                    (StringVal(s), TokenType::Less, StringVal(s2)) => {
+                        Ok(LiteralVal::is_boolean_truthy(s < s2))
+                    }
+                    (StringVal(s), TokenType::LessEqual, StringVal(s2)) => {
+                        Ok(LiteralVal::is_boolean_truthy(s <= s2))
+                    }
+
+                    (NumVal(x), op, StringVal(s)) => Err(format!(
+                        "Cannot use {} operater between Number and String types -=({} and {})=-",
+                        op, x, s
+                    )),
+                    (StringVal(s), op, NumVal(x)) => Err(format!(
+                        "Cannot use {} operater between String and Number types -=({} and {})=-",
+                        op, s, x
+                    )),
+
+                    (x, TokenType::BangEqual, y) => Ok(LiteralVal::is_boolean_truthy(x != y)),
+                    (x, TokenType::EqualEqual, y) => Ok(LiteralVal::is_boolean_truthy(x == y)),
+                    (x, op, y) => Err(format!(
+                        "{} not yet implemented for -=({:?} and {:?})=-",
+                        op,
+                        x.as_literal_type(),
+                        y.as_literal_type()
+                    )),
                 }
             }
         }
@@ -250,4 +281,3 @@ impl Expr {
 // //         Ok(())
 // //     }
 // // }
-
