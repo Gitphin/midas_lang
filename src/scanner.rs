@@ -1,19 +1,19 @@
-use std::string::String;
 use std::collections::HashMap;
+use std::string::String;
 
 // Checks if numeric / can parse as digit
 fn is_digit(c: char) -> bool {
-    return (c as u8) >= ('0' as u8) && (c as u8) <= ('9' as u8)
+    return (c as u8) >= ('0' as u8) && (c as u8) <= ('9' as u8);
 }
 // Checks if it is alpha
 fn is_alpha(c: char) -> bool {
-    return ((c as u8) >= ('a' as u8) && (c as u8) <= ('z' as u8)) || 
-    ((c as u8) >= ('A' as u8) && (c as u8) <= ('Z' as u8)) 
-    || c == '_'
+    return ((c as u8) >= ('a' as u8) && (c as u8) <= ('z' as u8))
+        || ((c as u8) >= ('A' as u8) && (c as u8) <= ('Z' as u8))
+        || c == '_';
 }
 // Checks if alphanumeric
 fn is_alpha_num(c: char) -> bool {
-    return is_alpha(c) || is_digit(c)
+    return is_alpha(c) || is_digit(c);
 }
 
 fn get_kws_hash() -> HashMap<&'static str, TokenType> {
@@ -36,7 +36,6 @@ fn get_kws_hash() -> HashMap<&'static str, TokenType> {
         ("var", Var),
         ("while", While),
     ])
-
 }
 
 pub struct Scanner {
@@ -52,12 +51,12 @@ impl Scanner {
     // Initialize scanner struct
     pub fn new(s: &str) -> Self {
         Self {
-            source: s.to_string(), 
+            source: s.to_string(),
             tokens: vec![],
             start: 0,
             current: 0,
             line: 1,
-            kws: get_kws_hash()
+            kws: get_kws_hash(),
         }
     }
     // Scans the token information from struct
@@ -74,10 +73,11 @@ impl Scanner {
         }
         // token creation
         self.tokens.push(Token {
-            token_type: Eof, 
-            lexeme: "".to_string(), 
-            literal: None, 
-            line_num: self.line});
+            token_type: Eof,
+            lexeme: "".to_string(),
+            literal: None,
+            line_num: self.line,
+        });
         // makes err vec proper
         if errs.len() > 0 {
             let mut join = "".to_string();
@@ -91,7 +91,7 @@ impl Scanner {
         Ok(self.tokens.clone())
     }
     // checks if at end of line
-    fn is_at_end (&self) -> bool {
+    fn is_at_end(&self) -> bool {
         self.current >= self.source.len()
     }
     // Scans a token data char by char
@@ -108,35 +108,49 @@ impl Scanner {
             '+' => self.add_token(Plus),
             ';' => self.add_token(Semicolon),
             '*' => self.add_token(Star),
-            '!' => {let t = if self.match_char('=') {
-                BangEqual 
-            } else { 
-                Bang 
-            }; self.add_token(t);},
-            '=' => {let t = if self.match_char('=') {
-                EqualEqual 
-            } else { 
-                Equal 
-            }; self.add_token(t);},
-            '<' => {let t = if self.match_char('=') {
-                LessEqual 
-            } else { 
-                Less
-            }; self.add_token(t);},
-            '>' => {let t = if self.match_char('=') {
-                GreaterEqual 
-            } else { 
-                Greater 
-            }; self.add_token(t);},
-            '/' => { 
+            '!' => {
+                let t = if self.match_char('=') {
+                    BangEqual
+                } else {
+                    Bang
+                };
+                self.add_token(t);
+            }
+            '=' => {
+                let t = if self.match_char('=') {
+                    EqualEqual
+                } else {
+                    Equal
+                };
+                self.add_token(t);
+            }
+            '<' => {
+                let t = if self.match_char('=') {
+                    LessEqual
+                } else {
+                    Less
+                };
+                self.add_token(t);
+            }
+            '>' => {
+                let t = if self.match_char('=') {
+                    GreaterEqual
+                } else {
+                    Greater
+                };
+                self.add_token(t);
+            }
+            '/' => {
                 if self.match_char('/') {
                     //NOTE: Handled weird before, may have to chang && expr
                     while self.peek() != '\n' && !self.is_at_end() {
                         self.advance();
-                    }                      
+                    }
                 } else {
-                    self.add_token(Slash);}},
-            ' ' | '\r' | '\t' => {},
+                    self.add_token(Slash);
+                }
+            }
+            ' ' | '\r' | '\t' => {}
             '\n' => self.line += 1,
             // string handling
             '"' => self.string()?,
@@ -144,15 +158,12 @@ impl Scanner {
             c => {
                 if is_digit(c) {
                     self.number()?;
-                } 
-                else if is_alpha(c) {
+                } else if is_alpha(c) {
                     self.identifier()?;
-
                 } else {
                     return Err(format!("Bad char at line {}: {}", self.line, c));
                 }
-            }
-            //NOTE: This may have to be changed later
+            } //NOTE: This may have to be changed later
         }
         Ok(())
     }
@@ -165,7 +176,7 @@ impl Scanner {
         if let Some(&t) = self.kws.get(s) {
             self.add_token(t);
         } else {
-        self.add_token(Identifier);
+            self.add_token(Identifier);
         }
         Ok(())
     }
@@ -194,7 +205,7 @@ impl Scanner {
         if self.current + 1 >= self.source.len() {
             return '\0';
         }
-        return self.source.chars().nth(self.current + 1).unwrap()
+        return self.source.chars().nth(self.current + 1).unwrap();
     }
     // Handle string literals
     fn string(&mut self) -> Result<(), String> {
@@ -222,24 +233,25 @@ impl Scanner {
         // if at end ret null terminator
         match self.is_at_end() {
             true => return '\0',
-            _ => return self.source.chars().nth(self.current).unwrap()
+            _ => return self.source.chars().nth(self.current).unwrap(),
         }
     }
     // Checks if next char is the expected val
     fn match_char(&mut self, expect: char) -> bool {
-       // if at end there should be no other char
-       if self.is_at_end() {
-           return false
-       }
-       // if not expected val ret false
-       if self.source.chars().nth(self.current).unwrap() as char != expect {
-           return false
-       } else { 
-       // incr curr pointer
-           self.current +=1; return true 
-       }
+        // if at end there should be no other char
+        if self.is_at_end() {
+            return false;
+        }
+        // if not expected val ret false
+        if self.source.chars().nth(self.current).unwrap() as char != expect {
+            return false;
+        } else {
+            // incr curr pointer
+            self.current += 1;
+            return true;
+        }
     }
-    // Advances string index of the source 
+    // Advances string index of the source
     fn advance(&mut self) -> char {
         //NOTE: Updating curr might have to be placed BEFORE let c
         let c = self.source.chars().nth(self.current).unwrap();
@@ -252,9 +264,7 @@ impl Scanner {
     }
     // Add source to the lexeme
     fn add_token_p2(&mut self, token_type: TokenType, literal: Option<LiteralVal>) {
-        let mut text = "".to_string();
-        // get byte rep of source so can index
-        let _ = self.source[self.start..self.current].chars().map(|c| text.push(c));
+        let text = self.source[self.start..self.current].to_string();
         // add to token vec
         self.tokens.push(Token {
             token_type,
@@ -262,25 +272,55 @@ impl Scanner {
             literal,
             line_num: self.line,
         });
-
     }
 }
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub enum TokenType {
     // Single Char
-    LParen, RParen, LBrace, RBrace, 
-    Comma, Dot, Minus, Plus, Semicolon, Slash, Star,
+    LParen,
+    RParen,
+    LBrace,
+    RBrace,
+    Comma,
+    Dot,
+    Minus,
+    Plus,
+    Semicolon,
+    Slash,
+    Star,
     // Single/Double Char
-    Bang, BangEqual, Equal, EqualEqual,
-    Greater, GreaterEqual, Less, LessEqual,
+    Bang,
+    BangEqual,
+    Equal,
+    EqualEqual,
+    Greater,
+    GreaterEqual,
+    Less,
+    LessEqual,
     // Literals
-    Identifier, StringLit, Number,
+    Identifier,
+    StringLit,
+    Number,
     // Keywords
-    And, Class, Else, False, Fun, For, If, Null,
-    Or, Print, Return, Super, This, True, Var, While,
+    And,
+    Class,
+    Else,
+    False,
+    Fun,
+    For,
+    If,
+    Null,
+    Or,
+    Print,
+    Return,
+    Super,
+    This,
+    True,
+    Var,
+    While,
 
-    Eof
+    Eof,
 }
 
 use crate::TokenType::*;
@@ -312,8 +352,18 @@ impl std::fmt::Display for TokenType {
 
 impl Token {
     // Initialize token struct
-    pub fn new_token(token_type: TokenType, lexeme: String, literal: Option<LiteralVal>, line_num: usize) -> Self {
-        Self{token_type, lexeme, literal, line_num}
+    pub fn new_token(
+        token_type: TokenType,
+        lexeme: String,
+        literal: Option<LiteralVal>,
+        line_num: usize,
+    ) -> Self {
+        Self {
+            token_type,
+            lexeme,
+            literal,
+            line_num,
+        }
     }
     // Converts to string format
     pub fn to_string(&self) -> String {
@@ -359,11 +409,11 @@ impl Token {
 //         match scan.tokens[0].literal {
 //             Some(FVal(v)) => assert_eq!(v, 12.23),
 //             _ => panic!("Nope"),
-//         }    
+//         }
 //         match scan.tokens[1].literal {
 //             Some(FVal(v)) => assert_eq!(v, 33.0),
 //             _ => panic!("Nope"),
-//         }    
+//         }
 //     }
 
 //     #[test]
