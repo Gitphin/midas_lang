@@ -139,6 +139,7 @@ impl Expr {
                     _ => todo!(),
                 }
             }
+            // TODO: Keep adding stuff for this
             Expr::Binary { l, op, r } => {
                 let l = l.eval()?;
                 let r = r.eval()?;
@@ -147,19 +148,31 @@ impl Expr {
                     (NumVal(x), TokenType::Minus, NumVal(y)) => Ok(NumVal(x - y)),
                     (NumVal(x), TokenType::Slash, NumVal(y)) => Ok(NumVal(x / y)),
                     (NumVal(x), TokenType::Star, NumVal(y)) => Ok(NumVal(x * y)),
-                    (NumVal(x), TokenType::Greater, NumVal(y)) => Ok(LiteralVal::from_boolean(x > y)),
-                    (NumVal(x), TokenType::GreaterEqual, NumVal(y)) => Ok(LiteralVal::from_boolean(x >= y)),
+                    (NumVal(x), TokenType::Greater, NumVal(y)) => {
+                        Ok(LiteralVal::from_boolean(x > y))
+                    }
+                    (NumVal(x), TokenType::GreaterEqual, NumVal(y)) => {
+                        Ok(LiteralVal::from_boolean(x >= y))
+                    }
                     (NumVal(x), TokenType::Less, NumVal(y)) => Ok(LiteralVal::from_boolean(x < y)),
-                    (NumVal(x), TokenType::LessEqual, NumVal(y)) => Ok(LiteralVal::from_boolean(x <= y)),
+                    (NumVal(x), TokenType::LessEqual, NumVal(y)) => {
+                        Ok(LiteralVal::from_boolean(x <= y))
+                    }
+                    (NumVal(x), TokenType::BangEqual, NumVal(y)) => {
+                        Ok(LiteralVal::from_boolean(x != y))
+                    }
+                    (NumVal(x), TokenType::EqualEqual, NumVal(y)) => {
+                        Ok(LiteralVal::from_boolean(x == y))
+                    }
 
                     (StringVal(s), TokenType::Plus, StringVal(ss)) => {
                         Ok(StringVal(format!("{}{}", s, ss)))
                     }
-                    (NumVal(_), _, StringVal(_)) => {
-                        Err("Cannot operate between string and number types".to_string())
+                    (NumVal(_), op, StringVal(_)) => {
+                        Err(format!("Cannot use {} operater between string and number types", op))
                     }
-                    (StringVal(_), _, NumVal(_)) => {
-                        Err("Cannot operate between string and number types".to_string())
+                    (StringVal(_), op, NumVal(_)) => {
+                        Err(format!("Cannot use {} operater between string and number types", op))
                     }
                     _ => todo!(),
                 }
@@ -237,3 +250,4 @@ impl Expr {
 // //         Ok(())
 // //     }
 // // }
+
