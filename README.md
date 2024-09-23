@@ -25,13 +25,11 @@ Basic right now, make better in future
 **Want to change keywords later to camel case / diff names
 ### Expression Tree - [x]
 Small optimizations to be made, use of
-unwrapping should be limited
+unwrapping/clone should be limited
 ### Parser - [x]
 Small bugfixes needed such as '(' parenthesis and  
 when to panic vs when no to
-### Interpretor - [ ]
-Move to seperate file? Right now just in expr
+### Interpretor - [x]
 Add more cases / line numbers in error msgs
-Format error message of Literal types better (ex: TrueVal to 'true')
 
 
