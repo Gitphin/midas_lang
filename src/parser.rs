@@ -179,13 +179,6 @@ impl Parser {
             }
             match self.peek().token_type {
                 Class | Fun | Var | For | If | While | Print | Return => return,
-                // TokenType::Class => return (),
-                // TokenType::Class => return (),
-                // TokenType::Class => return (),
-                // TokenType::Class => return (),
-                // TokenType::Class => return (),
-                // TokenType::Class => return (),
-                // TokenType::Class => return (),
                 _ => self.advance(),
             };
         }
@@ -244,3 +237,4 @@ mod tests {
         assert_eq!(se, "(== (- 8 2) (+ 5 1))");
     }
 }
+
