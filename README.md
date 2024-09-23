@@ -18,6 +18,9 @@ cargo run
 - String concatenation
 - A cool funny looking dude in the prompt
 
+### IN PROGRESS:
+- States/Statements
+
 # TODO:
 
 ### Scanner - [x]

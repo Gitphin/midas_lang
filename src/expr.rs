@@ -157,7 +157,16 @@ impl Expr {
                 match (l.clone(), op.token_type, r.clone()) {
                     (NumVal(x), TokenType::Plus, NumVal(y)) => Ok(NumVal(x + y)),
                     (NumVal(x), TokenType::Minus, NumVal(y)) => Ok(NumVal(x - y)),
-                    (NumVal(x), TokenType::Slash, NumVal(y)) => Ok(NumVal(x / y)),
+                    (NumVal(x), TokenType::Slash, NumVal(y)) => {
+                        if y != 0.0 {
+                            Ok(NumVal(x / y))
+                        } else {
+                            Err(format!(
+                                "Cannot divide -=({})=- by 0, results in infinity",
+                                x
+                            ))
+                        }
+                    }
                     (NumVal(x), TokenType::Star, NumVal(y)) => Ok(NumVal(x * y)),
 
                     (NumVal(x), TokenType::Greater, NumVal(y)) => {
@@ -188,6 +197,16 @@ impl Expr {
                     (StringVal(s), TokenType::LessEqual, StringVal(s2)) => {
                         Ok(LiteralVal::is_boolean_truthy(s <= s2))
                     }
+                    // UNCOMMENT IF YOU WANT TO TREAT NUM + STR OPERATIONS AS VALID
+
+//                     (NumVal(x), TokenType::Plus, StringVal(s)) => {
+//                         let x2 = x.to_string();
+//                         Ok(StringVal(format!("{}{}", x2, s)))
+//                     }
+//                     (StringVal(s), TokenType::Plus, NumVal(x)) => {
+//                         let x2 = x.to_string();
+//                         Ok(StringVal(format!("{}{}", x2, s)))
+//                     }
 
                     (NumVal(x), op, StringVal(s)) => Err(format!(
                         "Cannot use {} operater between Number and String types -=({} and {})=-",
