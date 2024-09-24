@@ -1,3 +1,6 @@
+#![allow(dead_code)]
+#![allow(unused_variables)]
+
 use crate::scanner;
 use crate::scanner::{Token, TokenType};
 // use std::process::exit;
@@ -6,6 +9,7 @@ use crate::scanner::{Token, TokenType};
 // use std::io::{BufWriter, Write};
 
 // Literal value class (converted to enum for Rust implementation)
+
 #[derive(Clone, Debug, PartialEq)]
 pub enum LiteralVal {
     NumVal(f32),
@@ -33,6 +37,7 @@ fn unwrap_as_str(literal: Option<scanner::LiteralVal>) -> String {
         _ => panic!("Could not unwrap as String"),
     }
 }
+
 impl LiteralVal {
     // Formats the literal value as a string
     pub fn format_str(&self) -> String {

@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+#![allow(unused_variables)]
 use crate::expr::{Expr, Expr::*, LiteralVal};
 use crate::scanner::{Token, TokenType, TokenType::*};
 
