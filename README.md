@@ -15,7 +15,7 @@ cargo run
 - [Print](#print)
 ---
 ### Print
-- **Description**: Loads data from a specified file.
+- **Description**: Prints value to the console.
 - **Usage**: 
     ```text
     print(3 + 6) -> 9
