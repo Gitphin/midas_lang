@@ -19,10 +19,13 @@ impl Parser {
         let mut statements: Vec<Statement> = Vec::new();
         let mut errs: Vec<String> = Vec::new();
         while !self.is_at_end() {
-            let statement = self.statement();
+            let statement = self.declaration();
             match statement {
                 Ok(st) => statements.push(st),
-                Err(e) => {errs.push(e); self.synchronize();},
+                Err(e) => {
+                    errs.push(e);
+                    self.synchronize();
+                }
             }
         }
         if errs.len() == 0 {
@@ -30,6 +33,28 @@ impl Parser {
         } else {
             Err(errs.join("\n =+> "))
         }
+    }
+
+    fn declaration(&mut self) -> Result<Statement, String> {
+        if self.matching(Var) {
+            return self.var_declaration();
+        } else {
+            return self.statement();
+        }
+    }
+
+    fn var_declaration(&mut self) -> Result<Statement, String> {
+        let tk = self.consume(Identifier, "Expected variable name")?;
+
+        let initi;
+        if self.matching(Equal) {
+            initi = self.expression()?;
+        } else {
+            initi = Literal { val: LiteralVal::NullVal };
+        }
+
+        self.consume(Semicolon, "Expecting -=(';')=- at end")?;
+        Ok(Statement::Var { t: tk, init: initi  })
     }
 
     fn statement(&mut self) -> Result<Statement, String> {
@@ -143,15 +168,24 @@ impl Parser {
                     val: LiteralVal::token_fmt(t),
                 }
             }
+            Identifier => {
+                self.advance();
+                res = Variable {
+                    name: self.previous(), 
+                }
+            }
+
+
             _ => return Err("Expected expression here".to_string()),
         };
         Ok(res)
     }
-    fn consume(&mut self, ttype: TokenType, err: &str) -> Result<(), String> {
+    fn consume(&mut self, ttype: TokenType, err: &str) -> Result<Token, String> {
         let t = self.peek();
         if t.token_type == ttype {
             self.advance();
-            Ok(())
+            let t = self.previous();
+            Ok(t)
         } else {
             Err(err.to_string())
         }

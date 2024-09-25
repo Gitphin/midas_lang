@@ -2,6 +2,7 @@
 #![allow(unused_variables)]
 mod expr;
 mod interpreter;
+mod enviro;
 mod literals;
 mod parser;
 mod scanner;
