@@ -3,6 +3,7 @@
 
 use crate::literals::LiteralVal;
 use crate::literals::LiteralVal::*;
+use crate::enviro::Enviro;
 use crate::scanner::{Token, TokenType};
 
 // AST expression implementation
@@ -22,6 +23,9 @@ pub enum Expr {
         op: Token,
         r: Box<Expr>,
     },
+    Variable {
+        name: Token,
+    }
 }
 
 impl Expr {
@@ -34,6 +38,7 @@ impl Expr {
             Expr::Grouping { expr } => format!("(group {})", expr.format_str()),
             Expr::Literal { val } => format!("{}", val.format_str()),
             Expr::Unary { op, r } => format!("({} {})", op.lexeme, r.format_str()),
+            Expr::Variable { name } => format!("var {}", name.lexeme),
         }
     }
     // Prints structure of syntax tree (useful for debugging)
@@ -41,12 +46,16 @@ impl Expr {
         println!("{}", self.format_str());
     }
     // This acts as my interpeter, evaluates expressions
-    pub fn eval(&self) -> Result<LiteralVal, String> {
+    pub fn eval(&self, enviro: &Enviro) -> Result<LiteralVal, String> {
         match self {
+            Expr::Variable { name } => match enviro.get(&name.lexeme) {
+                Some(v) => Ok(v.clone()),
+                None => Err(format!("Variable -=({})=- has not been declared!", name.lexeme))
+            },
             Expr::Literal { val } => Ok(val.clone()),
-            Expr::Grouping { expr } => expr.eval(),
+            Expr::Grouping { expr } => expr.eval(enviro),
             Expr::Unary { op, r } => {
-                let r = r.eval()?;
+                let r = r.eval(enviro)?;
                 match (op.token_type, r.clone()) {
                     (TokenType::Minus, NumVal(x)) => Ok(NumVal(-x)),
                     // TODO: add for floats
@@ -60,8 +69,8 @@ impl Expr {
             }
             // TODO: Keep adding stuff for this
             Expr::Binary { l, op, r } => {
-                let l = l.eval()?;
-                let r = r.eval()?;
+                let l = l.eval(enviro)?;
+                let r = r.eval(enviro)?;
                 match (l.clone(), op.token_type, r.clone()) {
                     (NumVal(x), TokenType::Plus, NumVal(y)) => Ok(NumVal(x + y)),
                     (NumVal(x), TokenType::Minus, NumVal(y)) => Ok(NumVal(x - y)),
