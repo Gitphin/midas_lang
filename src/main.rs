@@ -2,8 +2,10 @@
 #![allow(unused_variables)]
 mod expr;
 mod interpreter;
+mod literals;
 mod parser;
 mod scanner;
+mod statement;
 use crate::interpreter::*;
 use crate::parser::*;
 use crate::scanner::*;
@@ -57,9 +59,10 @@ fn run(intr: &mut Interpreter, contents: &str) -> Result<(), String> {
     let mut s = Scanner::new(contents);
     let tokens = s.scan_tokens()?;
     let mut p = Parser::new(tokens);
-    let e = p.parse()?;
-    let r = intr.interpret(e)?;
-    println!("{}", r.format_str());
+    let stmnts = p.parse()?;
+    for st in stmnts {
+        intr.interpret_statement(st)?;
+    }
     Ok(())
 }
 
@@ -75,4 +78,3 @@ fn main() -> Result<(), String> {
         }
     }
 }
-
