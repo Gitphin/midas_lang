@@ -26,7 +26,7 @@ cargo run
   
 - **Return Value**: Returns a value that gets printed to console.
 
-- ### Variable
+### Variable
 - **Description**: Stores a variable in the global state.
 - **Usage**: 
     ```text
