@@ -13,6 +13,7 @@ cargo run
 ---
 ## Mini-Documentation
 - [Print](#print)
+- [Variable](#variable)
 ---
 ### Print
 - **Description**: Prints value to the console.
@@ -24,6 +25,13 @@ cargo run
   - *v*: The literal value to be printed to the console.
   
 - **Return Value**: Returns a value that gets printed to console.
+
+- ### Variable
+- **Description**: Stores a variable in the global state.
+- **Usage**: 
+    ```text
+    let a = 2 // print a -> 2
+    ```
 ---
 ### FEATURES:
 - Math!
